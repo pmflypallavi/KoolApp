@@ -1,0 +1,50 @@
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.logo {
+  background-color: #0D122B;
+  padding: 10px;
+  color: white;
+}
+
+#itemImage {
+	height: 200px;
+	width: 150px;
+}
+
+
+
+
+table {
+	border-spacing: 20px;
+}
+
+.display {
+	margin-top: 20px;
+	margin-left: 20px;
+	margin-right: 20px;
+	margin-bottom: 20px;
+}
+.productName {
+	text-align: center;
+	font-weight: bold;
+}
+
+.productPrice {
+	text-align: center;
+}
+
+.productImage {
+	height: 160px;
+	width: 200px;
+	margin-left: 20px;
+	margin-right: 20px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	display: inline-block;
+	float: left;
+}
+.displayCategory ul li {
+	font-size: 20px;
+}

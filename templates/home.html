@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Kool App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/w3css/3/w3.css">
+  </head>
+  <body>
+    {% extends "template.html" %}
+    {% block content %}
+    <!-- Slide Show -->
+    <section>
+ <center> <img class="mySlides" src={{ url_for('static', filename="images/women_image.jpg")}}
+  width="75%" height="50%"></center>
+  <center><img class="mySlides" src={{ url_for('static', filename="images/men_clothings.jpg")}}
+  width="75%" height="50%"></center>
+  <center><img class="mySlides" src={{ url_for('static', filename="images/handbag_image.jpg")}}
+  width="75%" height="50%"></center>
+    </section>
+<section class="w3-container w3-center w3-content" style="max-width:600px">
+  <h2 class="w3-wide">THE ONE STOP SOLUTION FOR ALL SHOPPING NEEDS</h2>
+  <p class="w3-opacity"><i>We are Team Agastya</i></p>
+  <p class="w3-justify">Raju</p>
+  <p class="w3-justify"> Pallavi  </p>
+  <p class="w3-justify"> Vivek  </p>
+  <p class="w3-justify"> Hari  </p>
+  <p class="w3-justify"> Sarvana </p>
+  <p class="w3-justify"> Leela  </p>
+</section>
+<script>
+// Automatic Slideshow - change image every 3 seconds
+var myIndex = 0;
+carousel();
+
+function carousel() {
+  var i;
+  var x = document.getElementsByClassName("mySlides");
+  for (i = 0; i < x.length; i++) {
+    x[i].style.display = "none";
+  }
+  myIndex++;
+  if (myIndex > x.length) {myIndex = 1}
+  x[myIndex-1].style.display = "block";
+  setTimeout(carousel, 3000);
+}
+</script>
+      
+    {% endblock %}
+  </body>
+</html>
