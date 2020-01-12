@@ -47,6 +47,13 @@ body {
   text-align: center;
   background-color: #f1f1f1;
 }
+.stock {
+  color: #FF0000;
+}
+
+.stock.green {
+    color: #33FF3C;
+}
 </style>
 </head>
 <body>
@@ -62,13 +69,25 @@ body {
             <a href="/productDescription?productId={{row[1]}}"><img src={{ url_for('static', filename='images/' + row[1]) + '.jpg' }} id="itemImage" /></a>
             <p>Price: ${{row[2]}}</p>
             <p>Discount: {{row[3]}}</p>
-            <p>Stock: {{row[4]}}</p>
+            <p>Size:{{ row[5] }}</p>
+            <p class="stock">{{row[4]}}</p>
 
         </div>
         <br>
     </div>
     {% endfor %}
 </div>
+<script>
+    var els = document.getElementsByClassName('stock');
+    for (var i = 0; i < els.length; i++) {
+  var cell = els[i];
+  if (cell.textContent =='OUT OF STOCK') {
+    cell.classList.remove('green')
+  }
+  else {
+    cell.classList.add('green');
+  }
+}</script>
 {% endfor %}
 {% endblock %}
 </body>
