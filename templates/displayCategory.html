@@ -52,7 +52,8 @@ body {
 }
 
 .stock.green {
-  color: #33FF3C;
+    color: #33FF3C;
+}
 </style>
 </head>
 <body>
@@ -68,6 +69,7 @@ body {
             <a href="/productDescription?productId={{row[1]}}"><img src={{ url_for('static', filename='images/' + row[1]) + '.jpg' }} id="itemImage" /></a>
             <p>Price: ${{row[2]}}</p>
             <p>Discount: {{row[3]}}</p>
+            <p>Size:{{ row[5] }}</p>
             <p class="stock">{{row[4]}}</p>
 
         </div>
