@@ -3,7 +3,7 @@ from flask_mysqldb import MySQL
 
 application = Flask(__name__)
 
-application.config['MYSQL_HOST'] = 'custom-mysql.gamification.svc.cluster.local'
+application.config['MYSQL_HOST'] = '127.0.0.1'
 application.config['MYSQL_USER'] = 'xxuser'
 application.config['MYSQL_PASSWORD'] = 'welcome1'
 application.config['MYSQL_DB'] = 'sampledb'
