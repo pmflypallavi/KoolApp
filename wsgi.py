@@ -49,7 +49,7 @@ def displayCategory():
     try:
         cur = mysql.connection.cursor()
         res = cur.execute(
-            "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK  from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B,sampledb.XXIBM_PRODUCT_STYLE C where A.ITEM_NUMBER=B.ITEM_NUMBER and A.STYLE_ITEM=C.ITEM_NUMBER and A.STYLE_ITEM=%s",
+            "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1  from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B,sampledb.XXIBM_PRODUCT_STYLE C where A.ITEM_NUMBER=B.ITEM_NUMBER and A.STYLE_ITEM=C.ITEM_NUMBER and A.STYLE_ITEM=%s",
             (categoryId,))
         if res > 0:
             productData = cur.fetchall()
@@ -83,7 +83,7 @@ def search():
         try:
             cur = mysql.connection.cursor()
             res = cur.execute(
-                "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER  and (A.DESCRIPTION like %s or A.SKU_ATTRIBUTE_VALUE1 like %s or A.SKU_ATTRIBUTE_VALUE2 like %s)",
+                "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1 from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER  and (A.DESCRIPTION like %s or A.SKU_ATTRIBUTE_VALUE1 like %s or A.SKU_ATTRIBUTE_VALUE2 like %s)",
                 (categoryId, categoryId, categoryId))
             if res > 0:
                 data = cur.fetchall()
@@ -105,7 +105,7 @@ def brandCategory():
     try:
         cur = mysql.connection.cursor()
         res = cur.execute(
-            "Select  DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK from sampledb.XXIBM_PRODUCT_SKU A,sampledb.XXIBM_PRODUCT_PRICING B ,sampledb.XXIBM_PRODUCT_CATALOGUE C where C.COMMODITY=A.catalogue_category and A.ITEM_NUMBER=B.ITEM_NUMBER and C.FAMILY=%s",
+            "Select  DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1 from sampledb.XXIBM_PRODUCT_SKU A,sampledb.XXIBM_PRODUCT_PRICING B ,sampledb.XXIBM_PRODUCT_CATALOGUE C where C.COMMODITY=A.catalogue_category and A.ITEM_NUMBER=B.ITEM_NUMBER and C.FAMILY=%s",
             (categoryId,))
         if res > 0:
             productData = cur.fetchall()
