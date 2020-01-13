@@ -258,10 +258,11 @@ def removeItem():
     return redirect(url_for('about', noofitem=noofitems, productId=listitem))
 
 
-@application.route("/checkout")
+@application.route("/checkout",methods=['GET','POST'])
 def checkout():
-    return '<html><body><h1>Thank you for shopping with us!!!!</h1></body></html>'
-
+    if request.method =='POST':
+        return '<html><body><h1>Thank you for shopping with us!!!!</h1></body></html>'
+    return render_template("checkout.html")
 
 if __name__ == "__main__":
     application.run()
