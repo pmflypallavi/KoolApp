@@ -42,25 +42,46 @@ def about():
     cur.close()
 
 
-@application.route("/displayCategory")
+@application.route("/displayCategory", methods=['GET', 'POST'])
 def displayCategory():
-    categoryId = request.args.get('categoryId')
-    product = []
-    try:
-        cur = mysql.connection.cursor()
-        res = cur.execute(
-            "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1  from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B,sampledb.XXIBM_PRODUCT_STYLE C where A.ITEM_NUMBER=B.ITEM_NUMBER and A.STYLE_ITEM=C.ITEM_NUMBER and A.STYLE_ITEM=%s",
-            (categoryId,))
-        if res > 0:
-            productData = cur.fetchall()
-            product.append(productData)
-            return render_template("displayCategory.html", data=product)
-        else:
-            error = "Sorry No data available"
-            return render_template("error.html", error=error)
-    except Exception as e:
-        return str(e)
-    cur.close()
+    if request.method == "POST":
+        ColorId = request.form.getlist('Color')
+        product = []
+        try:
+            ColorIds=tuple(ColorId)
+            print(ColorIds)
+            cur = mysql.connection.cursor()
+            res = cur.execute(
+                "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1 from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER  and A.SKU_ATTRIBUTE_VALUE1 in %s and A.SKU_ATTRIBUTE_VALUE2 in %s",
+                (ColorIds,ColorIds))
+            if res > 0:
+                data = cur.fetchall()
+                product.append(data)
+                return render_template("displayCategory.html", data=product)
+            else:
+                error = "Sorry No data available"
+                return render_template("error.html", error=error)
+        except Exception as e:
+            return str(e)
+        return render_template('displayCategory.html')
+    else:
+        categoryId = request.args.get('categoryId')
+        product = []
+        try:
+            cur = mysql.connection.cursor()
+            res = cur.execute(
+                "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1  from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B,sampledb.XXIBM_PRODUCT_STYLE C where A.ITEM_NUMBER=B.ITEM_NUMBER and A.STYLE_ITEM=C.ITEM_NUMBER and A.STYLE_ITEM=%s",
+                (categoryId,))
+            if res > 0:
+                productData = cur.fetchall()
+                product.append(productData)
+                return render_template("displayCategory.html", data=product)
+            else:
+                error = "Sorry No data available"
+                return render_template("error.html", error=error)
+        except Exception as e:
+            return str(e)
+        cur.close()
 
 
 @application.route("/search", methods=['GET', 'POST'])
@@ -83,7 +104,7 @@ def search():
         try:
             cur = mysql.connection.cursor()
             res = cur.execute(
-                "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1 from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER  and (A.DESCRIPTION like %s or A.SKU_ATTRIBUTE_VALUE1 like %s or A.SKU_ATTRIBUTE_VALUE2 like %s)",
+                "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1 from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER  and (A.LONG_DESCRIPTION like %s or A.SKU_ATTRIBUTE_VALUE1 like %s or A.SKU_ATTRIBUTE_VALUE2 like %s)",
                 (categoryId, categoryId, categoryId))
             if res > 0:
                 data = cur.fetchall()
