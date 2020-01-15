@@ -19,7 +19,21 @@ def home():
 def about():
     no_of_item = request.args.get('noofitem')
     cart_product_id = request.args.getlist('productId')
-    ##page_name= request.args.get('pagename')
+    page_name= request.args.get('pagename')
+    if page_name == 'Cart':
+        ls = cart_product_id
+        newls = ls[0].rstrip(')').lstrip('(').split(',')
+        item = []
+        listitem = []
+        for a in newls:
+            item.append(a.strip("'"))
+        if len(item) == 2 and item[1] == '':
+            listitem.append(item[0].strip("'"))
+        else:
+            for val in item:
+                listitem.append(val.lstrip(' ').strip("'"))
+        cart_product_id=listitem
+    print("about",cart_product_id)
     if no_of_item == None:
         no_of_item = 0
     else:
