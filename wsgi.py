@@ -3,13 +3,12 @@ from flask_mysqldb import MySQL
 
 application = Flask(__name__)
 
-application.config['MYSQL_HOST'] = 'custom-mysql.gamification.svc.cluster.local'
+application.config['MYSQL_HOST'] = '127.0.0.1'
 application.config['MYSQL_USER'] = 'xxuser'
 application.config['MYSQL_PASSWORD'] = 'welcome1'
 application.config['MYSQL_DB'] = 'sampledb'
 mysql = MySQL(application)
-total = []
-
+listitem = []
 
 @application.route("/")
 def home():
@@ -19,8 +18,8 @@ def home():
 @application.route("/about")
 def about():
     no_of_item = request.args.get('noofitem')
-    cart_product_id = request.args.get('productId')
-
+    cart_product_id = request.args.getlist('productId')
+    ##page_name= request.args.get('pagename')
     if no_of_item == None:
         no_of_item = 0
     else:
@@ -204,24 +203,30 @@ def productDescription():
     cur.close()
 
 
+@application.route("/addToCart")
+def addToCart():
+    productId = request.args.get('productId')
+    print("add",productId)
+    listitem.append(productId)
+    print(listitem)
+    noofitems = len(listitem)
+    return redirect(url_for('about', noofitem=noofitems, productId=listitem,pagename='addcart'))
+
+
 @application.route("/Cart")
 def cart():
     productId = request.args.get('productId')
-    name = request.args.get('page')
-    if (name == 'aboutpage'):
-        total.clear()
-        ls = []
-        ls = list(productId.rstrip(')').lstrip('(').split(","))
-        if len(ls) == 2 and ls[1] == '':
-            total.append(ls[0].strip("'"))
-        else:
-            for val in ls:
-                total.append(val.lstrip(' ').strip("'"))
+    print("Cart",productId)
+    ls = list(productId.rstrip(']').lstrip('[').split(","))
+    listitem = []
+    if len(ls) == 2 and ls[1] == '':
+        listitem.append(ls[0].strip("'"))
     else:
-        total.append(productId)
+        for val in ls:
+            listitem.append(val.lstrip(' ').strip("'"))
     try:
-        totalproduct = tuple(total)
-        print(totalproduct)
+        totalproduct = tuple(listitem)
+        print("cart",totalproduct)
         cur = mysql.connection.cursor()
         res = cur.execute(
             "Select A.DESCRIPTION ,B.ITEM_NUMBER ,CASE WHEN B.DISCOUNT<>'0.0' THEN B.LIST_PRICE-B.LIST_PRICE*B.DISCOUNT ELSE B.LIST_PRICE END  AS DISCOUNT,(Select SUM(CASE WHEN B.DISCOUNT<>'0.0' THEN (B.LIST_PRICE-B.LIST_PRICE*B.DISCOUNT) ELSE B.LIST_PRICE END) from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER and A.ITEM_NUMBER in %s ) AS Total_price,(Select count(B.ITEM_NUMBER) from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B  where A.ITEM_NUMBER=B.ITEM_NUMBER and A.ITEM_NUMBER in %s) as no_of_item  from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER and A.ITEM_NUMBER in %s",
@@ -245,7 +250,6 @@ def cart():
 def removeItem():
     productId = request.args.get('productId')
     itemnumber = request.args.get('itemnum')
-
     ls = list(itemnumber.rstrip(')').lstrip('(').split(","))
     listitem = []
     if len(ls) == 2 and ls[1] == '':
@@ -255,7 +259,8 @@ def removeItem():
             listitem.append(val.lstrip(' ').strip("'"))
     listitem.remove(productId)
     noofitems = len(listitem)
-    return redirect(url_for('about', noofitem=noofitems, productId=listitem))
+    print("remove",listitem)
+    return redirect(url_for('about', noofitem=noofitems, productId=listitem,pagename='removecart'))
 
 
 @application.route("/checkout",methods=['GET','POST'])
