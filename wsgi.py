@@ -113,7 +113,6 @@ def search():
     if request.method == "POST":
         categoryId = request.form.get('search')
         data = request.form.get('search')
-        print(word_tokenize(data))
         words = categoryId.split()
         if len(words) > 0:
             categoryId = '%'
