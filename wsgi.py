@@ -1,6 +1,6 @@
 from flask import *
 from flask_mysqldb import MySQL
-from nltk.tokenize import word_tokenize
+
 application = Flask(__name__)
 
 application.config['MYSQL_HOST'] = 'custom-mysql.gamification.svc.cluster.local'
