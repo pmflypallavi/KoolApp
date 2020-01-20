@@ -1,6 +1,5 @@
 from flask import *
 from flask_mysqldb import MySQL
-from nltk.tokenize import word_tokenize
 application = Flask(__name__)
 
 application.config['MYSQL_HOST'] = '127.0.0.1'
@@ -113,7 +112,6 @@ def search():
     if request.method == "POST":
         categoryId = request.form.get('search')
         data = request.form.get('search')
-        print(word_tokenize(data))
         words = categoryId.split()
         if len(words) > 0:
             categoryId = '%'
@@ -127,11 +125,13 @@ def search():
         else:
             categoryId = '%' + categoryId + '%'
         product = []
+        print(categoryId)
         try:
             cur = mysql.connection.cursor()
             res = cur.execute(
-                "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1 from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER  and (A.LONG_DESCRIPTION like %s or A.SKU_ATTRIBUTE_VALUE1 like %s or A.SKU_ATTRIBUTE_VALUE2 like %s or concat(A.LONG_DESCRIPTION,A.SKU_ATTRIBUTE_VALUE2) like %s or concat(A.SKU_ATTRIBUTE_VALUE2,A.LONG_DESCRIPTION) like %s or concat(A.LONG_DESCRIPTION,A.SKU_ATTRIBUTE_VALUE1) like %s or concat(A.SKU_ATTRIBUTE_VALUE1,A.LONG_DESCRIPTION) like %s)",
-                (categoryId, categoryId, categoryId,categoryId,categoryId,categoryId,categoryId))
+                "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1 from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER  and (A.LONG_DESCRIPTION like %s or A.SKU_ATTRIBUTE_VALUE1 like %s or A.SKU_ATTRIBUTE_VALUE2 like %s or concat(A.LONG_DESCRIPTION,A.SKU_ATTRIBUTE_VALUE2) like %s or concat(A.SKU_ATTRIBUTE_VALUE2,A.LONG_DESCRIPTION) like %s or concat(A.LONG_DESCRIPTION,A.SKU_ATTRIBUTE_VALUE1) like %s or concat(A.SKU_ATTRIBUTE_VALUE1,A.LONG_DESCRIPTION) like %s"
+                "or concat(A.SKU_ATTRIBUTE_VALUE1,A.SKU_ATTRIBUTE_VALUE2) like %s or concat(A.SKU_ATTRIBUTE_VALUE2,A.SKU_ATTRIBUTE_VALUE1) like %s or concat(A.LONG_DESCRIPTION ,concat(A.SKU_ATTRIBUTE_VALUE1,A.SKU_ATTRIBUTE_VALUE2)) like %s or concat(A.LONG_DESCRIPTION ,concat(A.SKU_ATTRIBUTE_VALUE2,A.SKU_ATTRIBUTE_VALUE1)) like %s)",
+                (categoryId, categoryId, categoryId,categoryId,categoryId,categoryId,categoryId,categoryId,categoryId,categoryId,categoryId))
             if res > 0:
                 data = cur.fetchall()
                 product.append(data)
