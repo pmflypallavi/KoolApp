@@ -1,8 +1,12 @@
 from flask import *
 from flask_mysqldb import MySQL
+<<<<<<< HEAD
+=======
+
+>>>>>>> 17af074312bf8e44b9ca596683c28ee0f3ec3716
 application = Flask(__name__)
 
-application.config['MYSQL_HOST'] = '127.0.0.1'
+application.config['MYSQL_HOST'] = 'custom-mysql.gamification.svc.cluster.local'
 application.config['MYSQL_USER'] = 'xxuser'
 application.config['MYSQL_PASSWORD'] = 'welcome1'
 application.config['MYSQL_DB'] = 'sampledb'
