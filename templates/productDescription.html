@@ -155,10 +155,12 @@ function magnify(imgID, zoom) {
             </table>
             <h2>Description</h2>
             <p>{{data[5]}}</p>
+    {% if stock == 'IN_STOCK' %}
         </div>
         <div id="addToCart">
 		<a href="/addToCart?productId={{request.args.get('productId')}}" class="next">Add to Cart</a>
 	    </div>
+    {% endif %}
     </div>
     </div>
 </div>
