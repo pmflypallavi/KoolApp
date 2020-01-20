@@ -1,9 +1,6 @@
 from flask import *
 from flask_mysqldb import MySQL
-<<<<<<< HEAD
-=======
 
->>>>>>> 17af074312bf8e44b9ca596683c28ee0f3ec3716
 application = Flask(__name__)
 
 application.config['MYSQL_HOST'] = 'custom-mysql.gamification.svc.cluster.local'
