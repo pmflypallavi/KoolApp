@@ -10,6 +10,7 @@ application.config['MYSQL_DB'] = 'sampledb'
 mysql = MySQL(application)
 listitem = []
 
+
 @application.route("/")
 def home():
     return render_template("home.html")
@@ -19,7 +20,7 @@ def home():
 def about():
     no_of_item = request.args.get('noofitem')
     cart_product_id = request.args.getlist('productId')
-    page_name= request.args.get('pagename')
+    page_name = request.args.get('pagename')
     if page_name == 'Cart':
         ls = cart_product_id
         newls = ls[0].rstrip(')').lstrip('(').split(',')
@@ -32,8 +33,8 @@ def about():
         else:
             for val in item:
                 listitem.append(val.lstrip(' ').strip("'"))
-        cart_product_id=listitem
-    print("about",cart_product_id)
+        cart_product_id = listitem
+    print("about", cart_product_id)
     if no_of_item == None:
         no_of_item = 0
     else:
@@ -60,24 +61,46 @@ def displayCategory():
     if request.method == "POST":
         ColorId = request.form.getlist('Color')
         SizeId = request.form.getlist('Size')
+        Discount = request.form.getlist('Discount')
         product = []
         try:
             cur = mysql.connection.cursor()
-            if len(ColorId)==0:
-                SizeIds=tuple(SizeId)
+            if len(ColorId) == 0 and len(Discount) == 0:
+                SizeIds = tuple(SizeId)
                 res = cur.execute(
-                "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1 from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER  and A.SKU_ATTRIBUTE_VALUE1 in %s ",
+                    "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1 from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER  and A.SKU_ATTRIBUTE_VALUE1 in %s ",
                     (SizeIds,))
-            elif len(SizeId)==0:
+            elif len(SizeId) == 0 and len(Discount) == 0:
                 ColorIds = tuple(ColorId)
                 res = cur.execute(
                     "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1 from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER  and  A.SKU_ATTRIBUTE_VALUE2 in %s",
                     (ColorIds,))
-            else:
+            elif len(Discount) == 0:
                 valueId = tuple(ColorId + SizeId)
                 res = cur.execute(
                     "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1 from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER  and (A.SKU_ATTRIBUTE_VALUE1 in %s and A.SKU_ATTRIBUTE_VALUE2 in %s)",
-                    (valueId,valueId))
+                    (valueId, valueId))
+            elif len(SizeId) == 0 and len(ColorId) == 0:
+                DisIds = tuple(Discount)
+                res = cur.execute(
+                    "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1 from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER  and  B.DISCOUNT in %s",
+                    (DisIds,))
+            elif len(SizeId) == 0:
+                valueId = tuple(ColorId + Discount)
+                res = cur.execute(
+                    "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1 from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER  and (A.SKU_ATTRIBUTE_VALUE2 in %s and B.DISCOUNT in %s)",
+                    (valueId, valueId))
+            elif len(ColorId) == 0:
+                valueId = tuple(SizeId + Discount)
+                res = cur.execute(
+                    "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1 from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER  and (A.SKU_ATTRIBUTE_VALUE1 in %s and B.DISCOUNT in %s)",
+                    (valueId, valueId))
+            else:
+                valueId = tuple(ColorId+ SizeId + Discount)
+                res = cur.execute(
+                    "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1 from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER  and (A.SKU_ATTRIBUTE_VALUE1 in %s and A.SKU_ATTRIBUTE_VALUE2 in %s and B.DISCOUNT in %s)",
+                    (valueId, valueId,valueId))
+
             if res > 0:
                 data = cur.fetchall()
                 product.append(data)
@@ -132,7 +155,8 @@ def search():
             res = cur.execute(
                 "Select DISTINCT A.DESCRIPTION,B.ITEM_NUMBER,B.LIST_PRICE,CASE WHEN B.DISCOUNT='0.0' or B.DISCOUNT IS NULL THEN 'No Discount' else CONCAT(substring_index(DISCOUNT*100,'.',1),'%%') end as  DISCOUNT,CASE WHEN B.IN_STOCK='Yes' THEN 'IN STOCK' ELSE 'OUT OF STOCK' END AS STOCK,A.SKU_ATTRIBUTE_VALUE1 from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER  and (A.LONG_DESCRIPTION like %s or A.SKU_ATTRIBUTE_VALUE1 like %s or A.SKU_ATTRIBUTE_VALUE2 like %s or concat(A.LONG_DESCRIPTION,A.SKU_ATTRIBUTE_VALUE2) like %s or concat(A.SKU_ATTRIBUTE_VALUE2,A.LONG_DESCRIPTION) like %s or concat(A.LONG_DESCRIPTION,A.SKU_ATTRIBUTE_VALUE1) like %s or concat(A.SKU_ATTRIBUTE_VALUE1,A.LONG_DESCRIPTION) like %s"
                 "or concat(A.SKU_ATTRIBUTE_VALUE1,A.SKU_ATTRIBUTE_VALUE2) like %s or concat(A.SKU_ATTRIBUTE_VALUE2,A.SKU_ATTRIBUTE_VALUE1) like %s or concat(A.LONG_DESCRIPTION ,concat(A.SKU_ATTRIBUTE_VALUE1,A.SKU_ATTRIBUTE_VALUE2)) like %s or concat(A.LONG_DESCRIPTION ,concat(A.SKU_ATTRIBUTE_VALUE2,A.SKU_ATTRIBUTE_VALUE1)) like %s)",
-                (categoryId, categoryId, categoryId,categoryId,categoryId,categoryId,categoryId,categoryId,categoryId,categoryId,categoryId))
+                (categoryId, categoryId, categoryId, categoryId, categoryId, categoryId, categoryId, categoryId,
+                 categoryId, categoryId, categoryId))
             if res > 0:
                 data = cur.fetchall()
                 product.append(data)
@@ -211,8 +235,8 @@ def productDescription():
         if res > 0:
             productData = cur.fetchone()
             product.append(productData)
-            stock=productData[4]
-            return render_template("productDescription.html", Itemdata=product,stock=stock)
+            stock = productData[4]
+            return render_template("productDescription.html", Itemdata=product, stock=stock)
         else:
             error = "Sorry No data available"
             return render_template("error.html", error=error)
@@ -224,17 +248,17 @@ def productDescription():
 @application.route("/addToCart")
 def addToCart():
     productId = request.args.get('productId')
-    print("add",productId)
+    print("add", productId)
     listitem.append(productId)
     print(listitem)
     noofitems = len(listitem)
-    return redirect(url_for('about', noofitem=noofitems, productId=listitem,pagename='addcart'))
+    return redirect(url_for('about', noofitem=noofitems, productId=listitem, pagename='addcart'))
 
 
 @application.route("/Cart")
 def cart():
     productId = request.args.get('productId')
-    print("Cart",productId)
+    print("Cart", productId)
     ls = list(productId.rstrip(']').lstrip('[').split(","))
     listitem = []
     if len(ls) == 2 and ls[1] == '':
@@ -244,7 +268,7 @@ def cart():
             listitem.append(val.lstrip(' ').strip("'"))
     try:
         totalproduct = tuple(listitem)
-        print("cart",totalproduct)
+        print("cart", totalproduct)
         cur = mysql.connection.cursor()
         res = cur.execute(
             "Select A.DESCRIPTION ,B.ITEM_NUMBER ,CASE WHEN B.DISCOUNT<>'0.0' THEN B.LIST_PRICE-B.LIST_PRICE*B.DISCOUNT ELSE B.LIST_PRICE END  AS DISCOUNT,(Select SUM(CASE WHEN B.DISCOUNT<>'0.0' THEN (B.LIST_PRICE-B.LIST_PRICE*B.DISCOUNT) ELSE B.LIST_PRICE END) from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER and A.ITEM_NUMBER in %s ) AS Total_price,(Select count(B.ITEM_NUMBER) from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B  where A.ITEM_NUMBER=B.ITEM_NUMBER and A.ITEM_NUMBER in %s) as no_of_item  from sampledb.XXIBM_PRODUCT_SKU A , sampledb.XXIBM_PRODUCT_PRICING B where A.ITEM_NUMBER=B.ITEM_NUMBER and A.ITEM_NUMBER in %s",
@@ -254,14 +278,12 @@ def cart():
             totalprice = productData[0][3]
             no_of_item = productData[0][4]
             return render_template("cart.html", Itemdata=productData, totalprice=totalprice, noOfItems=no_of_item,
-                                           totalItems=totalproduct)
+                                   totalItems=totalproduct)
         else:
             error = "Cart is empty"
             return render_template("error.html", error=error)
     except Exception as e:
         return str(e)
-
-
 
 
 @application.route("/removeFromCart")
@@ -277,15 +299,16 @@ def removeItem():
             listitem.append(val.lstrip(' ').strip("'"))
     listitem.remove(productId)
     noofitems = len(listitem)
-    print("remove",listitem)
-    return redirect(url_for('about', noofitem=noofitems, productId=listitem,pagename='removecart'))
+    print("remove", listitem)
+    return redirect(url_for('about', noofitem=noofitems, productId=listitem, pagename='removecart'))
 
 
-@application.route("/checkout",methods=['GET','POST'])
+@application.route("/checkout", methods=['GET', 'POST'])
 def checkout():
-    if request.method =='POST':
+    if request.method == 'POST':
         return '<html><body><h1>Thank you for shopping with us!!!!</h1></body></html>'
     return render_template("checkout.html")
+
 
 if __name__ == "__main__":
     application.run()
